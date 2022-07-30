@@ -5,15 +5,17 @@ import { dirname } from 'path'
 import {fileURLToPath} from 'url'
 import environmentVariables from './environmentVariables.js'
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 const KEY = environmentVariables.KEY 
 const baseURL = environmentVariables.baseURL
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const usedCommodityCode = [801, 401]
 
-const checkIfFolderExists = (() => {
-    if (fs.existsSync('./data')) return
-    
-    fs.mkdirSync('./data')
+const checkIfFoldersExists = (() => {
+    if (!fs.existsSync('./data')) {
+        fs.mkdirSync('./data')
+    } 
 })()
 
 const findRecentYears = (async () => {
@@ -62,8 +64,6 @@ const getCommodityAndYear = async (mostRecentYears) => {
         const dataLength = data.length
         const commodityCode = data[i].commodityCode
         const marketYear = data[i].marketYear
-
-        const usedCommodityCode = [801, 401]
       
         if(mostRecentYears.indexOf(marketYear) != -1 && usedCommodityCode.indexOf(commodityCode) != -1) {
             
@@ -76,12 +76,8 @@ const getCommodityAndYear = async (mostRecentYears) => {
 }
 
 const checkIfFileExists = (marketYear, commodityCode) => {
-    try {
-        fs.readFileSync(`./data/${marketYear}+${commodityCode}.json`)
-    } catch (error) {
-        fs.createWriteStream(
-            path.join(__dirname, './data', `${marketYear}+${commodityCode}.json`), { flags: 'a' }
-        ) 
+    if (!fs.readFileSync(`./data/${marketYear}+${commodityCode}.json`)) {
+        fs.createWriteStream(`./data/${marketYear}+${commodityCode}.json`)
     }
 }
 
@@ -103,7 +99,7 @@ const getDataFromUSDA = async (commodityCode, marketYear) => {
         saveData(data, marketYear, commodityCode)
                    
     } catch (error) {
-        fs.writeFileSync(path.join(__dirname, './error', `error.log`), error)
+        console.log(error)
     }
 }
 
