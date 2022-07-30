@@ -1,0 +1,8 @@
+# Private Files
+environmentVariables.js
+
+# Dependency directories
+node_modules/
+
+# Directories Created Dynamically
+data/
